@@ -1,0 +1,62 @@
+name: Verify parser source and browser distribution
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: palworld-save-parser-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          version: 12.21.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check formatting
+        run: pnpm format:check
+
+      - name: Check types
+        run: pnpm type-check
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Build release assets and corresponding source
+        run: pnpm build:release
+
+      - name: Verify package exports
+        run: |
+          mkdir -p /tmp/palworld-parser-pack
+          pnpm pack --pack-destination /tmp/palworld-parser-pack
+
+      - name: Upload release candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: palworld-save-parser-${{ github.sha }}
+          path: dist-app
+          if-no-files-found: error
+          retention-days: 7

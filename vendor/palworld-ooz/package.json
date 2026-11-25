@@ -1,0 +1,25 @@
+{
+  "name": "palworld-ooz",
+  "version": "0.1.0",
+  "description": "Reduced GPL Oodle decoder for Palworld save files",
+  "type": "module",
+  "license": "GPL-3.0-or-later",
+  "private": true,
+  "exports": {
+    "types": "./index.d.ts",
+    "default": "./index.js"
+  },
+  "files": [
+    "build/ooz.js",
+    "lib",
+    "CMakeLists.txt",
+    "index.d.ts",
+    "index.js",
+    "LICENSE",
+    "NOTICE.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "emcmake cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build"
+  }
+}
